@@ -384,6 +384,26 @@
             border-left: 4px solid var(--primary);
         }
 
+        /* Export Options */
+        .export-options {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .export-options label {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .export-options select {
+            padding: 8px 12px;
+            border: 1px solid var(--light-gray);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
         @media (max-width: 992px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -409,6 +429,11 @@
             
             .btn {
                 width: 100%;
+            }
+            
+            .export-options {
+                flex-direction: column;
+                align-items: flex-start;
             }
         }
     </style>
@@ -453,7 +478,15 @@
                             <h3>Transcription Result</h3>
                             <div class="btn-group">
                                 <button id="copyBtn" class="btn btn-success"><i class="fas fa-copy"></i> Copy</button>
-                                <button id="downloadBtn" class="btn"><i class="fas fa-download"></i> Download</button>
+                                <div class="export-options">
+                                    <label for="exportFormat">Export:</label>
+                                    <select id="exportFormat" class="form-control">
+                                        <option value="txt">TXT</option>
+                                        <option value="srt">SRT</option>
+                                        <option value="pdf">PDF</option>
+                                    </select>
+                                    <button id="downloadBtn" class="btn"><i class="fas fa-download"></i> Download</button>
+                                </div>
                                 <button id="clearBtn" class="btn btn-danger"><i class="fas fa-trash"></i> Clear</button>
                             </div>
                         </div>
@@ -482,18 +515,13 @@
                     <div class="form-group">
                         <label for="model">Model</label>
                         <select id="model" class="form-control">
-                            <option value="whisper-large-v3">Whisper Large v3 (Recommended)</option>
-                            <option value="whisper-large-v3-turbo">Whisper Large v3 Turbo</option>
+                            <option value="whisper-large-v3-turbo">Whisper Large v3 Turbo (Faster)</option>
+                            <option value="whisper-large-v3">Whisper Large v3 (Higher Accuracy)</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>
                             <input type="checkbox" id="timestamps" checked> Include Timestamps
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="diarization"> Speaker Diarization (Experimental)
                         </label>
                     </div>
                     <div class="btn-group">
@@ -560,6 +588,9 @@
         </footer>
     </div>
 
+    <!-- Include jsPDF library for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements
@@ -582,7 +613,7 @@
             const languageSelect = document.getElementById('language');
             const modelSelect = document.getElementById('model');
             const timestampsCheck = document.getElementById('timestamps');
-            const diarizationCheck = document.getElementById('diarization');
+            const exportFormat = document.getElementById('exportFormat');
 
             // Load saved settings
             function loadSettings() {
@@ -707,7 +738,6 @@
                 const language = languageSelect.value;
                 const model = modelSelect.value;
                 const includeTimestamps = timestampsCheck.checked;
-                const includeDiarization = diarizationCheck.checked;
                 
                 // Show progress
                 progressContainer.style.display = 'block';
@@ -729,8 +759,8 @@
                 formData.append('file', file);
                 formData.append('model', model);
                 
-                // Set response_format to verbose_json if timestamps or diarization are requested
-                if (includeTimestamps || includeDiarization) {
+                // Set response_format to verbose_json if timestamps are requested
+                if (includeTimestamps) {
                     formData.append('response_format', 'verbose_json');
                 }
                 
@@ -741,10 +771,6 @@
                 if (includeTimestamps) {
                     formData.append('timestamp_granularities[]', 'word');
                     formData.append('timestamp_granularities[]', 'segment');
-                }
-                
-                if (includeDiarization) {
-                    formData.append('diarization', 'true');
                 }
                 
                 try {
@@ -770,6 +796,12 @@
                     
                     const data = await response.json();
                     
+                    // Store segments for SRT export
+                    window.transcriptionData = {
+                        text: data.text,
+                        segments: data.segments || []
+                    };
+                    
                     // Display result
                     let result = data.text;
                     
@@ -777,14 +809,6 @@
                         // Format with timestamps
                         result = data.segments.map(segment => {
                             return `[${formatTime(segment.start)} - ${formatTime(segment.end)}] ${segment.text}`;
-                        }).join('\n\n');
-                    }
-                    
-                    if (includeDiarization && data.segments) {
-                        // Format with speaker labels
-                        result = data.segments.map(segment => {
-                            const speaker = segment.speaker || 'Speaker';
-                            return `[${formatTime(segment.start)}] ${speaker}: ${segment.text}`;
                         }).join('\n\n');
                     }
                     
@@ -803,6 +827,17 @@
             
             // Format time for timestamps
             function formatTime(seconds) {
+                const hrs = Math.floor(seconds / 3600);
+                const mins = Math.floor((seconds % 3600) / 60);
+                const secs = Math.floor(seconds % 60);
+                const ms = Math.floor((seconds % 1) * 1000);
+                
+                // For SRT format, we need HH:MM:SS,ms
+                return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')},${ms.toString().padStart(3, '0')}`;
+            }
+
+            // Format time for display (HH:MM:SS)
+            function formatTimeDisplay(seconds) {
                 const hrs = Math.floor(seconds / 3600);
                 const mins = Math.floor((seconds % 3600) / 60);
                 const secs = Math.floor(seconds % 60);
@@ -832,8 +867,21 @@
                     progressBar.style.width = '100%';
                     progressText.textContent = 'Processing: 100%';
                     
+                    // Create demo segments for SRT export
+                    const demoSegments = [
+                        { start: 0, end: 5, text: "Welcome to EasyTranscribe demo. This is a sample transcription generated by Groq's lightning-fast AI." },
+                        { start: 6, end: 12, text: "EasyTranscribe converts audio and video files to text with high accuracy. It supports multiple languages and provides timestamps for easy reference." },
+                        { start: 13, end: 20, text: "You can upload your own files or try this demo to see how it works. Your files are processed locally and never stored on our servers." }
+                    ];
+                    
+                    // Store segments for SRT export
+                    window.transcriptionData = {
+                        text: demoSegments.map(s => s.text).join(' '),
+                        segments: demoSegments
+                    };
+                    
                     // Demo result
-                    const demoResult = `[00:00:01 - 00:00:05] Welcome to EasyTranscribe demo. This is a sample transcription generated by Groq's lightning-fast AI. 
+                    const demoResult = `[00:00:00 - 00:00:05] Welcome to EasyTranscribe demo. This is a sample transcription generated by Groq's lightning-fast AI. 
                     
 [00:00:06 - 00:00:12] EasyTranscribe converts audio and video files to text with high accuracy. It supports multiple languages and provides timestamps for easy reference.
                     
@@ -864,7 +912,31 @@
 
             // Download result
             downloadBtn.addEventListener('click', function() {
-                const text = resultText.textContent;
+                const format = exportFormat.value;
+                const data = window.transcriptionData;
+                
+                if (!data) {
+                    alert('No transcription data available');
+                    return;
+                }
+                
+                switch (format) {
+                    case 'txt':
+                        downloadTxt(data.text);
+                        break;
+                    case 'srt':
+                        downloadSrt(data.segments);
+                        break;
+                    case 'pdf':
+                        downloadPdf(data.text);
+                        break;
+                    default:
+                        downloadTxt(data.text);
+                }
+            });
+
+            // Download as TXT
+            function downloadTxt(text) {
                 const blob = new Blob([text], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -874,13 +946,62 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-            });
+            }
+
+            // Download as SRT
+            function downloadSrt(segments) {
+                if (!segments || segments.length === 0) {
+                    alert('No timestamp data available for SRT export');
+                    return;
+                }
+                
+                let srtContent = '';
+                segments.forEach((segment, index) => {
+                    srtContent += `${index + 1}\n`;
+                    srtContent += `${formatTime(segment.start)} --> ${formatTime(segment.end)}\n`;
+                    srtContent += `${segment.text}\n\n`;
+                });
+                
+                const blob = new Blob([srtContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'transcription.srt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            // Download as PDF
+            function downloadPdf(text) {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.text('Transcription', 20, 20);
+                
+                // Add timestamp
+                doc.setFontSize(12);
+                const now = new Date();
+                doc.text(`Generated: ${now.toLocaleString()}`, 20, 30);
+                
+                // Add transcription text
+                doc.setFontSize(12);
+                const lines = doc.splitTextToSize(text, 170);
+                doc.text(lines, 20, 40);
+                
+                // Save the PDF
+                doc.save('transcription.pdf');
+            }
 
             // Clear result
             clearBtn.addEventListener('click', function() {
                 resultContainer.style.display = 'none';
                 progressContainer.style.display = 'none';
                 resetFileInput();
+                window.transcriptionData = null;
             });
 
             // Smooth scrolling for CTA buttons
