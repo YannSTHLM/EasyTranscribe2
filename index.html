@@ -729,6 +729,11 @@
                 formData.append('file', file);
                 formData.append('model', model);
                 
+                // Set response_format to verbose_json if timestamps are requested
+                if (includeTimestamps) {
+                    formData.append('response_format', 'verbose_json');
+                }
+                
                 if (language !== 'auto') {
                     formData.append('language', language);
                 }
