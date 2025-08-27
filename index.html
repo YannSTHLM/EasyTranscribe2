@@ -207,15 +207,65 @@
             flex-wrap: wrap;
         }
 
+        /* File List Styles */
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            background: var(--light);
+            border: 1px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: var(--transition);
+        }
+
+        .file-item:hover {
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.1);
+        }
+
+        .file-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-info i {
+            color: var(--primary);
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .file-size {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
         .progress-container {
-            margin: 20px 0;
+            margin: 15px 0;
             display: none;
         }
 
         .progress-bar {
-            height: 10px;
+            height: 8px;
             background: var(--light-gray);
-            border-radius: 5px;
+            border-radius: 4px;
             overflow: hidden;
         }
 
@@ -226,8 +276,14 @@
             transition: width 0.3s ease;
         }
 
+        .progress-text {
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
         .result-container {
-            margin-top: 20px;
+            margin-top: 15px;
             display: none;
         }
 
@@ -235,24 +291,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .result-text {
-            background: var(--light);
+            background: white;
             border: 1px solid var(--light-gray);
             border-radius: 8px;
-            padding: 20px;
-            max-height: 400px;
+            padding: 15px;
+            max-height: 200px;
             overflow-y: auto;
             white-space: pre-wrap;
             font-family: 'Courier New', monospace;
             border-left: 4px solid var(--primary);
-        }
-
-        .timestamp {
-            color: var(--primary);
-            font-weight: bold;
+            font-size: 0.9rem;
         }
 
         /* Features Section */
@@ -386,7 +438,6 @@
 
         /* Export Options */
         .export-options {
-            margin-top: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -395,10 +446,11 @@
         .export-options label {
             font-weight: 600;
             color: var(--primary-dark);
+            font-size: 0.9rem;
         }
 
         .export-options select {
-            padding: 8px 12px;
+            padding: 6px 10px;
             border: 1px solid var(--light-gray);
             border-radius: 6px;
             font-size: 0.9rem;
@@ -431,6 +483,12 @@
                 width: 100%;
             }
             
+            .file-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
             .export-options {
                 flex-direction: column;
                 align-items: flex-start;
@@ -446,7 +504,7 @@
                 <i class="fas fa-microphone-alt"></i>
                 <h1>EasyTranscribe</h1>
             </div>
-            <p class="tagline">Convert audio and video to text instantly with Groq's lightning-fast AI. Supports 50+ languages with exceptional accuracy.</p>
+            <p class="tagline">Convert audio and video to text instantly with Groq's lightning-fast AI. Supports 50+ languages with exceptional accuracy. Upload multiple files at once!</p>
             <div class="cta-buttons">
                 <a href="#upload-section" class="btn">Get Started</a>
                 <a href="#features" class="btn btn-secondary">Learn More</a>
@@ -460,37 +518,18 @@
                     <h2><i class="fas fa-upload"></i> Upload Audio/Video</h2>
                     <div class="upload-area" id="uploadArea">
                         <i class="fas fa-cloud-upload-alt"></i>
-                        <h3>Drag & Drop your file here</h3>
+                        <h3>Drag & Drop your files here</h3>
                         <p>or click to browse</p>
-                        <p class="small">Supports MP3, WAV, M4A, MP4, MOV, etc.</p>
+                        <p class="small">Supports MP3, WAV, M4A, MP4, MOV, etc. Multiple files allowed.</p>
                     </div>
-                    <input type="file" id="fileInput" class="file-input" accept="audio/*,video/*">
+                    <input type="file" id="fileInput" class="file-input" accept="audio/*,video/*" multiple>
                     
-                    <div class="progress-container" id="progressContainer">
-                        <div class="progress-bar">
-                            <div class="progress" id="progressBar"></div>
-                        </div>
-                        <p id="progressText">Processing: 0%</p>
-                    </div>
+                    <div class="file-list" id="fileList"></div>
                     
-                    <div class="result-container" id="resultContainer">
-                        <div class="result-header">
-                            <h3>Transcription Result</h3>
-                            <div class="btn-group">
-                                <button id="copyBtn" class="btn btn-success"><i class="fas fa-copy"></i> Copy</button>
-                                <div class="export-options">
-                                    <label for="exportFormat">Export:</label>
-                                    <select id="exportFormat" class="form-control">
-                                        <option value="txt">TXT</option>
-                                        <option value="srt">SRT</option>
-                                        <option value="pdf">PDF</option>
-                                    </select>
-                                    <button id="downloadBtn" class="btn"><i class="fas fa-download"></i> Download</button>
-                                </div>
-                                <button id="clearBtn" class="btn btn-danger"><i class="fas fa-trash"></i> Clear</button>
-                            </div>
-                        </div>
-                        <div class="result-text" id="resultText"></div>
+                    <div class="btn-group">
+                        <button id="transcribeBtn" class="btn" disabled><i class="fas fa-magic"></i> Transcribe All Files</button>
+                        <button id="clearAllBtn" class="btn btn-danger" style="display:none;"><i class="fas fa-trash"></i> Clear All</button>
+                        <button id="demoBtn" class="btn btn-secondary"><i class="fas fa-play"></i> Try Demo</button>
                     </div>
                 </div>
                 
@@ -524,9 +563,10 @@
                             <input type="checkbox" id="timestamps" checked> Include Timestamps
                         </label>
                     </div>
-                    <div class="btn-group">
-                        <button id="transcribeBtn" class="btn" disabled><i class="fas fa-magic"></i> Transcribe</button>
-                        <button id="demoBtn" class="btn btn-secondary"><i class="fas fa-play"></i> Try Demo</button>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="batchDownload"> Download All as ZIP
+                        </label>
                     </div>
                 </div>
             </div>
@@ -553,6 +593,16 @@
                 <i class="fas fa-bolt"></i>
                 <h3>Lightning Fast</h3>
                 <p>Powered by Groq's LPU for ultra-fast transcription speeds.</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-layer-group"></i>
+                <h3>Batch Processing</h3>
+                <p>Upload and transcribe multiple files simultaneously.</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-file-archive"></i>
+                <h3>ZIP Export</h3>
+                <p>Download all transcriptions as a single ZIP file.</p>
             </div>
         </section>
 
@@ -588,439 +638,6 @@
         </footer>
     </div>
 
-    <!-- Include jsPDF library for PDF export -->
+    <!-- Include jsPDF and JSZip libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // DOM Elements
-            const uploadArea = document.getElementById('uploadArea');
-            const fileInput = document.getElementById('fileInput');
-            const transcribeBtn = document.getElementById('transcribeBtn');
-            const demoBtn = document.getElementById('demoBtn');
-            const progressContainer = document.getElementById('progressContainer');
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressText');
-            const resultContainer = document.getElementById('resultContainer');
-            const resultText = document.getElementById('resultText');
-            const copyBtn = document.getElementById('copyBtn');
-            const downloadBtn = document.getElementById('downloadBtn');
-            const clearBtn = document.getElementById('clearBtn');
-            const apiKeyInput = document.getElementById('apiKey');
-            const apiUrlInput = document.getElementById('apiUrl');
-            const saveSettingsBtn = document.getElementById('saveSettings');
-            const settingsMessage = document.getElementById('settingsMessage');
-            const languageSelect = document.getElementById('language');
-            const modelSelect = document.getElementById('model');
-            const timestampsCheck = document.getElementById('timestamps');
-            const exportFormat = document.getElementById('exportFormat');
-
-            // Load saved settings
-            function loadSettings() {
-                const savedApiKey = localStorage.getItem('groq_api_key');
-                const savedApiUrl = localStorage.getItem('groq_api_url');
-                
-                if (savedApiKey) {
-                    apiKeyInput.value = savedApiKey;
-                }
-                
-                if (savedApiUrl) {
-                    apiUrlInput.value = savedApiUrl;
-                }
-                
-                // Enable transcribe button if API key is available
-                if (savedApiKey) {
-                    transcribeBtn.disabled = false;
-                }
-            }
-
-            // Save settings
-            saveSettingsBtn.addEventListener('click', function() {
-                const apiKey = apiKeyInput.value.trim();
-                const apiUrl = apiUrlInput.value.trim();
-                
-                if (apiKey) {
-                    localStorage.setItem('groq_api_key', apiKey);
-                    transcribeBtn.disabled = false;
-                    
-                    if (apiUrl) {
-                        localStorage.setItem('groq_api_url', apiUrl);
-                    }
-                    
-                    showSettingsMessage('Settings saved successfully!', 'success');
-                } else {
-                    showSettingsMessage('Please enter a valid API key', 'danger');
-                }
-            });
-
-            // Show settings message
-            function showSettingsMessage(message, type) {
-                settingsMessage.textContent = message;
-                settingsMessage.className = `alert alert-${type}`;
-                settingsMessage.style.display = 'block';
-                
-                setTimeout(() => {
-                    settingsMessage.style.display = 'none';
-                }, 3000);
-            }
-
-            // File upload handlers
-            uploadArea.addEventListener('click', () => fileInput.click());
-            
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                
-                if (e.dataTransfer.files.length) {
-                    fileInput.files = e.dataTransfer.files;
-                    handleFileSelect();
-                }
-            });
-            
-            fileInput.addEventListener('change', handleFileSelect);
-            
-            function handleFileSelect() {
-                if (fileInput.files.length > 0) {
-                    const file = fileInput.files[0];
-                    const fileName = file.name;
-                    const fileSize = (file.size / 1024 / 1024).toFixed(2);
-                    
-                    uploadArea.innerHTML = `
-                        <i class="fas fa-file-audio"></i>
-                        <h3>${fileName}</h3>
-                        <p>Size: ${fileSize} MB</p>
-                        <button class="btn btn-danger" id="removeFileBtn">Remove File</button>
-                    `;
-                    
-                    document.getElementById('removeFileBtn').addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        resetFileInput();
-                    });
-                    
-                    transcribeBtn.disabled = false;
-                }
-            }
-            
-            function resetFileInput() {
-                fileInput.value = '';
-                uploadArea.innerHTML = `
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <h3>Drag & Drop your file here</h3>
-                    <p>or click to browse</p>
-                    <p class="small">Supports MP3, WAV, M4A, MP4, MOV, etc.</p>
-                `;
-                transcribeBtn.disabled = !apiKeyInput.value.trim();
-            }
-
-            // Transcription process
-            transcribeBtn.addEventListener('click', async function() {
-                if (!fileInput.files.length) {
-                    alert('Please select a file first');
-                    return;
-                }
-                
-                const apiKey = apiKeyInput.value.trim();
-                if (!apiKey) {
-                    alert('Please enter your Groq API key in the settings');
-                    return;
-                }
-                
-                const file = fileInput.files[0];
-                const language = languageSelect.value;
-                const model = modelSelect.value;
-                const includeTimestamps = timestampsCheck.checked;
-                
-                // Show progress
-                progressContainer.style.display = 'block';
-                progressBar.style.width = '0%';
-                progressText.textContent = 'Processing: 0%';
-                resultContainer.style.display = 'none';
-                
-                // Simulate progress (in a real app, this would be based on actual progress)
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += 5;
-                    if (progress > 90) progress = 90;
-                    progressBar.style.width = `${progress}%`;
-                    progressText.textContent = `Processing: ${progress}%`;
-                }, 200);
-                
-                // Create form data
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('model', model);
-                
-                // Set response_format to verbose_json if timestamps are requested
-                if (includeTimestamps) {
-                    formData.append('response_format', 'verbose_json');
-                }
-                
-                if (language !== 'auto') {
-                    formData.append('language', language);
-                }
-                
-                if (includeTimestamps) {
-                    formData.append('timestamp_granularities[]', 'word');
-                    formData.append('timestamp_granularities[]', 'segment');
-                }
-                
-                try {
-                    // Get API URL from settings or use default
-                    const apiUrl = apiUrlInput.value.trim() || 'https://api.groq.com/openai/v1/audio/transcriptions';
-                    
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${apiKey}`
-                        },
-                        body: formData
-                    });
-                    
-                    clearInterval(progressInterval);
-                    progressBar.style.width = '100%';
-                    progressText.textContent = 'Processing: 100%';
-                    
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error?.message || 'Transcription failed');
-                    }
-                    
-                    const data = await response.json();
-                    
-                    // Store segments for SRT export
-                    window.transcriptionData = {
-                        text: data.text,
-                        segments: data.segments || []
-                    };
-                    
-                    // Display result
-                    let result = data.text;
-                    
-                    if (includeTimestamps && data.segments) {
-                        // Format with timestamps
-                        result = data.segments.map(segment => {
-                            return `[${formatTime(segment.start)} - ${formatTime(segment.end)}] ${segment.text}`;
-                        }).join('\n\n');
-                    }
-                    
-                    resultText.textContent = result;
-                    resultContainer.style.display = 'block';
-                    
-                    // Scroll to result
-                    resultContainer.scrollIntoView({ behavior: 'smooth' });
-                    
-                } catch (error) {
-                    clearInterval(progressInterval);
-                    progressContainer.style.display = 'none';
-                    alert(`Error: ${error.message}`);
-                }
-            });
-            
-            // Format time for timestamps
-            function formatTime(seconds) {
-                const hrs = Math.floor(seconds / 3600);
-                const mins = Math.floor((seconds % 3600) / 60);
-                const secs = Math.floor(seconds % 60);
-                const ms = Math.floor((seconds % 1) * 1000);
-                
-                // For SRT format, we need HH:MM:SS,ms
-                return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')},${ms.toString().padStart(3, '0')}`;
-            }
-
-            // Format time for display (HH:MM:SS)
-            function formatTimeDisplay(seconds) {
-                const hrs = Math.floor(seconds / 3600);
-                const mins = Math.floor((seconds % 3600) / 60);
-                const secs = Math.floor(seconds % 60);
-                return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            }
-
-            // Demo button
-            demoBtn.addEventListener('click', function() {
-                // Show progress
-                progressContainer.style.display = 'block';
-                progressBar.style.width = '0%';
-                progressText.textContent = 'Processing: 0%';
-                resultContainer.style.display = 'none';
-                
-                // Simulate progress
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += 10;
-                    if (progress > 90) progress = 90;
-                    progressBar.style.width = `${progress}%`;
-                    progressText.textContent = `Processing: ${progress}%`;
-                }, 200);
-                
-                // Simulate API call with timeout
-                setTimeout(() => {
-                    clearInterval(progressInterval);
-                    progressBar.style.width = '100%';
-                    progressText.textContent = 'Processing: 100%';
-                    
-                    // Create demo segments for SRT export
-                    const demoSegments = [
-                        { start: 0, end: 5, text: "Welcome to EasyTranscribe demo. This is a sample transcription generated by Groq's lightning-fast AI." },
-                        { start: 6, end: 12, text: "EasyTranscribe converts audio and video files to text with high accuracy. It supports multiple languages and provides timestamps for easy reference." },
-                        { start: 13, end: 20, text: "You can upload your own files or try this demo to see how it works. Your files are processed locally and never stored on our servers." }
-                    ];
-                    
-                    // Store segments for SRT export
-                    window.transcriptionData = {
-                        text: demoSegments.map(s => s.text).join(' '),
-                        segments: demoSegments
-                    };
-                    
-                    // Demo result
-                    const demoResult = `[00:00:00 - 00:00:05] Welcome to EasyTranscribe demo. This is a sample transcription generated by Groq's lightning-fast AI. 
-                    
-[00:00:06 - 00:00:12] EasyTranscribe converts audio and video files to text with high accuracy. It supports multiple languages and provides timestamps for easy reference.
-                    
-[00:00:13 - 00:00:20] You can upload your own files or try this demo to see how it works. Your files are processed locally and never stored on our servers.`;
-                    
-                    resultText.textContent = demoResult;
-                    resultContainer.style.display = 'block';
-                    
-                    // Scroll to result
-                    resultContainer.scrollIntoView({ behavior: 'smooth' });
-                }, 2000);
-            });
-
-            // Copy result
-            copyBtn.addEventListener('click', function() {
-                navigator.clipboard.writeText(resultText.textContent)
-                    .then(() => {
-                        const originalText = copyBtn.innerHTML;
-                        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                        setTimeout(() => {
-                            copyBtn.innerHTML = originalText;
-                        }, 2000);
-                    })
-                    .catch(err => {
-                        console.error('Failed to copy: ', err);
-                    });
-            });
-
-            // Download result
-            downloadBtn.addEventListener('click', function() {
-                const format = exportFormat.value;
-                const data = window.transcriptionData;
-                
-                if (!data) {
-                    alert('No transcription data available');
-                    return;
-                }
-                
-                switch (format) {
-                    case 'txt':
-                        downloadTxt(data.text);
-                        break;
-                    case 'srt':
-                        downloadSrt(data.segments);
-                        break;
-                    case 'pdf':
-                        downloadPdf(data.text);
-                        break;
-                    default:
-                        downloadTxt(data.text);
-                }
-            });
-
-            // Download as TXT
-            function downloadTxt(text) {
-                const blob = new Blob([text], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'transcription.txt';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }
-
-            // Download as SRT
-            function downloadSrt(segments) {
-                if (!segments || segments.length === 0) {
-                    alert('No timestamp data available for SRT export');
-                    return;
-                }
-                
-                let srtContent = '';
-                segments.forEach((segment, index) => {
-                    srtContent += `${index + 1}\n`;
-                    srtContent += `${formatTime(segment.start)} --> ${formatTime(segment.end)}\n`;
-                    srtContent += `${segment.text}\n\n`;
-                });
-                
-                const blob = new Blob([srtContent], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'transcription.srt';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }
-
-            // Download as PDF
-            function downloadPdf(text) {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                // Add title
-                doc.setFontSize(18);
-                doc.text('Transcription', 20, 20);
-                
-                // Add timestamp
-                doc.setFontSize(12);
-                const now = new Date();
-                doc.text(`Generated: ${now.toLocaleString()}`, 20, 30);
-                
-                // Add transcription text
-                doc.setFontSize(12);
-                const lines = doc.splitTextToSize(text, 170);
-                doc.text(lines, 20, 40);
-                
-                // Save the PDF
-                doc.save('transcription.pdf');
-            }
-
-            // Clear result
-            clearBtn.addEventListener('click', function() {
-                resultContainer.style.display = 'none';
-                progressContainer.style.display = 'none';
-                resetFileInput();
-                window.transcriptionData = null;
-            });
-
-            // Smooth scrolling for CTA buttons
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
-
-            // Initialize
-            loadSettings();
-        });
-    </script>
-</body>
-</html>
+    <script src="https://cd
