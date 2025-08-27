@@ -135,7 +135,7 @@
             transition: var(--transition);
             background: rgba(37, 99, 235, 0.05);
             position: relative;
-            z-index: 10;
+            z-index: 1;
         }
 
         .upload-area:hover, .upload-area.dragover {
@@ -167,7 +167,7 @@
             text-align: center;
             text-decoration: none;
             position: relative;
-            z-index: 100;
+            z-index: 10;
         }
 
         .btn:hover {
@@ -260,19 +260,19 @@
         .file-actions {
             display: flex;
             gap: 10px;
-            z-index: 200;
+            z-index: 20;
             position: relative;
         }
 
         .file-actions button {
-            z-index: 200;
+            z-index: 20;
             position: relative;
         }
 
         .progress-container {
             margin: 15px 0;
             display: none;
-            z-index: 50;
+            z-index: 5;
             position: relative;
         }
 
@@ -299,7 +299,7 @@
         .result-container {
             margin-top: 15px;
             display: none;
-            z-index: 50;
+            z-index: 5;
             position: relative;
         }
 
@@ -324,7 +324,7 @@
             border-left: 4px solid var(--primary);
             font-size: 0.9rem;
             position: relative;
-            z-index: 10;
+            z-index: 1;
         }
 
         /* Features Section */
@@ -461,7 +461,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            z-index: 100;
+            z-index: 10;
             position: relative;
         }
 
@@ -476,7 +476,7 @@
             border: 1px solid var(--light-gray);
             border-radius: 6px;
             font-size: 0.9rem;
-            z-index: 100;
+            z-index: 10;
             position: relative;
         }
 
@@ -654,4 +654,4 @@
                 <label for="apiUrl">API URL (Optional)</label>
                 <input type="text" id="apiUrl" class="form-control" placeholder="https://api.groq.com/openai/v1/audio/transcriptions">
             </div>
-            <button id="saveSettings" class="btn btn-secondary
+            <button id="saveSettings" class="btn btn-secondary">Save Se
